@@ -12,16 +12,25 @@
 
 int main(int ac, char **av)
 {
+
+    sfVideoMode mode = {1920, 1080, 32};
+    sfRenderWindow* window;
+    sfTexture* texture;
+    sfSprite* sprite;
+    sfEvent event;
+
     if (ac == 2 && my_strcmp(av[1], "-h") == 0) {
         print_usages();
         return (0);
     }
-    sfVideoMode mode = {1920, 1080, 32};
-    sfRenderWindow* window;
-    sfEvent event;
     window = sfRenderWindow_create(mode, "My Radar", sfResize | sfClose, NULL);
     if (!window)
         return EXIT_FAILURE;
+    texture = sfTexture_createFromFile("resources/background.png", NULL);
+    if (!texture)
+        return EXIT_FAILURE;
+    sprite = sfSprite_create();
+    sfSprite_setTexture(sprite, texture, sfTrue);
     while (sfRenderWindow_isOpen(window))
     {
         while (sfRenderWindow_pollEvent(window, &event))
@@ -29,9 +38,12 @@ int main(int ac, char **av)
             if (event.type == sfEvtClosed)
                 sfRenderWindow_close(window);
         }
-        sfRenderWindow_clear(window, sfBlack);
+        sfRenderWindow_clear(window, sfWhite);
+        sfRenderWindow_drawSprite(window, sprite, NULL);
         sfRenderWindow_display(window);
     }
+    sfSprite_destroy(sprite);
+    sfTexture_destroy(texture);
     sfRenderWindow_destroy(window);
     return EXIT_SUCCESS;
 }
