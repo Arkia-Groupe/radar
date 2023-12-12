@@ -13,4 +13,6 @@
     #include <stdbool.h>
     #include <stdlib.h>
     #include "../lib/my/lib.h"
+
+void print_usages(void);
 #endif /* RADAR_H */

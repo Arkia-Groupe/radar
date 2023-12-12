@@ -7,7 +7,8 @@
 
 NAME    =       my_radar
 
-SRCS = src/main.c
+SRCS = src/main.c \
+       src/utils/print_usages.c
 
 CC = gcc
 

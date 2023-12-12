@@ -1,6 +1,6 @@
 /*
 ** EPITECH PROJECT, 2023
-** B-CPE-110-REN-1-1-organized-nathan.barbet
+** B-MUL-100-REN-1-1-myradar-savinien.petitjean
 ** File description:
 ** main.c
 */
@@ -9,8 +9,13 @@
 #include <SFML/Audio.h>
 #include <SFML/Graphics.h>
 #include <stdlib.h>
-int main()
+
+int main(int ac, char **av)
 {
+    if (ac == 2 && my_strcmp(av[1], "-h") == 0) {
+        print_usages();
+        return (0);
+    }
     sfVideoMode mode = {1920, 1080, 32};
     sfRenderWindow* window;
     sfEvent event;
