@@ -1,69 +1,111 @@
 /*
 ** EPITECH PROJECT, 2023
-** B-MUL-100-REN-1-1-myradar-savinien.petitjean
+** B-MUL-100-REN-1-1-myradar-nathan.barbet
 ** File description:
 ** main.c
 */
 
-#include "../include/radar.h"
-#include <SFML/Audio.h>
-#include <SFML/Graphics.h>
 #include <stdlib.h>
+#include <string.h>
+#include <SFML/Graphics.h>
+#include "../include/simulation.h"
+#include "../include/map.h"
+#include "../include/init_CSFML.h"
+#include "../include/my.h"
 
-int main(int ac, char **av)
+int show_hitboxes = 0;
+
+void print_usage(void)
 {
+    my_printf("Air traffic simulation panel\n");
+    my_printf("USAGE\n");
+    my_printf("  ./my_radar [OPTIONS] path_to_script\n");
+    my_printf("  path_to_script The path to the script file.\n");
+    my_printf("OPTIONS\n");
+    my_printf("  -h print the usage and quit.\n");
+    my_printf("USER INTERACTIONS\n");
+    my_printf("  ‘L’ key enable/disable hitboxes and a\n");
+}
 
-    sfVideoMode mode = {1920, 1080, 32};
-    sfRenderWindow* window;
-    sfTexture* txt_background;
-    sfSprite* sprt_background;
-    sfTexture* txt_tower;
-    sfSprite* sprt_tower;
-    sfEvent event;
-
-    sfCircleShape* circle = sfCircleShape_create();
-    sfCircleShape_setRadius(circle, 50);
-    sfCircleShape_setOutlineThickness(circle, 2);
-    sfCircleShape_setOutlineColor(circle, sfBlue);
-    sfCircleShape_setFillColor(circle, sfTransparent);
-    sfCircleShape_setPosition(circle, (sfVector2f){960, 540});
-    sfCircleShape_setScale(circle, (sfVector2f){2, 2});
-
-    if (ac == 2 && my_strcmp(av[1], "-h") == 0) {
-        print_usages();
-        return (0);
+void handle_events_main(sfEvent event, csfml **csfml, int *shouldClose)
+{
+    if (!csfml || !*csfml || !(*csfml)->window) {
+        return;
     }
-    window = sfRenderWindow_create(mode, "My Radar", sfResize | sfClose, NULL);
-    if (!window)
-        return EXIT_FAILURE;
-    txt_background = sfTexture_createFromFile("resources/background.png", NULL);
-    if (!txt_background)
-        return EXIT_FAILURE;
-    txt_tower = sfTexture_createFromFile("resources/tower.png", NULL);
-    if (!txt_tower)
-        return EXIT_FAILURE;
-    sprt_background = sfSprite_create();
-    sprt_tower = sfSprite_create();
-    sfSprite_setPosition(sprt_tower, (sfVector2f){960, 540});
-    sfSprite_setScale(sprt_tower, (sfVector2f){0.2, 0.2});
-    sfSprite_setTexture(sprt_background, txt_background, sfTrue);
-    sfSprite_setTexture(sprt_tower, txt_tower, sfTrue);
-    while (sfRenderWindow_isOpen(window))
-    {
-        while (sfRenderWindow_pollEvent(window, &event))
-        {
-            if (event.type == sfEvtClosed)
-                sfRenderWindow_close(window);
-        }
-        sfRenderWindow_clear(window, sfWhite);
-        sfRenderWindow_drawSprite(window, sprt_background, NULL);
-        sfRenderWindow_drawSprite(window, sprt_tower, NULL);
-        sfRenderWindow_drawCircleShape(window, circle, NULL);
-        sfRenderWindow_display(window);
+    if (event.type == sfEvtClosed) {
+        *shouldClose = 1;
     }
-    sfSprite_destroy(sprt_background);
-    sfTexture_destroy(txt_background);
-    sfRenderWindow_destroy(window);
-    sfCircleShape_destroy(circle);
-    return EXIT_SUCCESS;
+    if (event.type == sfEvtKeyPressed && event.key.code == sfKeyL)
+        show_hitboxes = !show_hitboxes;
+}
+
+csfml* initialize_csfml(void)
+{
+    csfml* csfml = init_csfml("resources/img/background.png");
+
+    if (!csfml)
+        my_printf("Failed to initialize csfml\n");
+    return csfml;
+}
+
+int initialize_simulation(char *script_filepath)
+{
+    if (init_simulation(script_filepath) != 0) {
+        my_printf("Failed to initialize simulation\n");
+        return 84;
+    }
+    return 0;
+}
+
+sfText* create_timer_text(void)
+{
+    sfText* timerText = sfText_create();
+    sfFont* font = sfFont_createFromFile("resources/fonts/Roboto-Black.ttf");
+
+    sfText_setPosition(timerText, (sfVector2f){1550, 0});
+    sfText_setColor(timerText, sfBlack);
+    sfText_setCharacterSize(timerText, 72);
+    if (!font) {
+        my_printf("Failed to load font\n");
+        return NULL;
+    }
+    sfText_setFont(timerText, font);
+    return timerText;
+}
+
+void handle_window_events(sfEvent event, csfml **csfml, int *should_close, int show_hitboxes)
+{
+    if (!csfml || !*csfml || !(*csfml)->window)
+        return;
+    if (event.type == sfEvtClosed)
+        *should_close = 1;
+    if (event.type == sfEvtKeyPressed && event.key.code == sfKeyL)
+        show_hitboxes = !show_hitboxes;
+}
+
+int main(int argc, char *argv[])
+{
+    int show_hitboxes = 0;
+    sfText* timer_text = create_timer_text();
+    csfml* csfml = initialize_csfml();
+    int should_close = 0;
+
+    if (check_args(argc, argv) != 1)
+        return 84;
+    if (!csfml)
+        return 84;
+    if (initialize_simulation(argv[1]) != 0) {
+        if (csfml->window)
+            sfRenderWindow_destroy(csfml->window);
+        (csfml);
+        return 84;
+    }
+    if (!timer_text)
+        return 84;
+    if (csfml && csfml->window)
+        initialize_and_run_simulation(csfml, timer_text, &should_close, show_hitboxes);
+    if (timer_text)
+        sfText_destroy(timer_text);
+    (csfml);
+    return 0;
 }

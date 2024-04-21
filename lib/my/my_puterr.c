@@ -7,7 +7,7 @@
 
 #include "lib.h"
 
-int my_putstr(char const *str)
+int my_puterr(char const *str)
 {
     int count;
 

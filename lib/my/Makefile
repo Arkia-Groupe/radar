@@ -20,6 +20,7 @@ SRCS = my_compute_power_rec.c \
        my_put_octal.c \
        my_putchar.c \
        my_putstr.c \
+       my_puterr.c \
        my_revstr.c \
        my_show_word_array.c \
        my_strcat.c \
@@ -32,7 +33,6 @@ SRCS = my_compute_power_rec.c \
        my_swap.c \
 	   my_printf.c \
 	   my_format.c \
-	   my_error.c \
 	   my_strpop.c
 
 
