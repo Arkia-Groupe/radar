@@ -30,7 +30,7 @@ void handle_event(sfEvent event, csfml **csfml, int *should_close)
         return;
     }
     if (event.type == sfEvtClosed) {
-        *should_close = 1;
+        exit(0);
     }
     if (event.type == sfEvtKeyPressed && event.key.code == sfKeyL)
         show_hitboxes = !show_hitboxes;

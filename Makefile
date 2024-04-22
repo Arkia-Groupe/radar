@@ -33,7 +33,7 @@ LIB_OBJS = $(LIB_SRCS:.c=.o)
 
 CC = gcc
 
-CFLAGS = -lasan -Iinclude
+CFLAGS = -Iinclude
 
 LDFLAGS = -L$(LIB_DIR) -lmy -lcsfml-graphics -lcsfml-window -lcsfml-system -lm 
 
